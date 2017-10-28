@@ -1,0 +1,6 @@
+com\sample\rest\data\service\Application.class
+com\sample\rest\data\dao\FileSystemDocumentDaoImpl.class
+com\sample\rest\data\model\DocumentMetaData.class
+com\sample\rest\data\service\IDocumentPersistService.class
+com\sample\rest\data\service\DocumentPersistServiceImpl.class
+com\sample\rest\data\model\Document.class
