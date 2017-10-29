@@ -1,10 +1,8 @@
 package com.sample.rest.data.dao;
 
-import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.OutputStream;
 import java.util.Properties;
 
 import javax.annotation.PostConstruct;
@@ -20,24 +18,20 @@ import com.sample.rest.data.model.Document;
 public class FileSystemDocumentDao{
 	
 	private static final Logger LOG = Logger.getLogger(FileSystemDocumentDao.class);
-	
+	@Autowired
+	private FlleStytemDocumentDaoHelper daoHelper;
 	@Autowired
 	private FileConfig fileConfig;
 	
 	@PostConstruct
     public void init() {
-        createDirectory(fileConfig.getUploadPath());
+		daoHelper.createDirectory(fileConfig.getUploadPath());
     }
-	
-	private void createDirectory(String path) {
-		 File file = new File(path);
-	     file.mkdirs();
-	}
 
 	public void insert(Document document) {
 		try {
-			createDocumentDirectory(document);
-			saveFile(document);
+			daoHelper.createDocumentDirectory(document);
+			daoHelper.saveFile(document);
 			saveMetaDatainFileSystem(document);
 		} catch (IOException e) {
 			String message = "Error while inserting document";
@@ -45,37 +39,14 @@ public class FileSystemDocumentDao{
             throw new RuntimeException(message, e);
 		}
 	}
-	
-	private String createDocumentDirectory(Document document) {
-        String path = getDirectoryPath(document);
-        createDirectory(path);
-        return path;
-    }
-
-	private String getDirectoryPath(Document document) {
-	       return getDirectoryPath(document.getUuid());
-    }
-    
-    private String getDirectoryPath(String uuid) {
-        StringBuilder sb = new StringBuilder();
-        sb.append(fileConfig.getUploadPath()).append(File.separator).append(uuid);
-        String path = sb.toString();
-        return path;
-    }
-	
 	private void saveMetaDatainFileSystem(Document document) throws IOException {
-		String path = getDirectoryPath(document);
-        Properties props = document.createProperties();
-        File f = new File(new File(path), fileConfig.getMetadataFileName());
-        OutputStream out = new FileOutputStream( f );
-        props.store(out, "Document meta data");
-    }
-
-	private void saveFile(Document document) throws IOException {
-		String path = getDirectoryPath(document);
-        BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(new File(path), document.getFileName())));
-        stream.write(document.getFileData());
-        stream.close();
+		String path = daoHelper.getDirectoryPath(document);
+		Properties props = document.createProperties();
+		File tempFile = new File(path);
+		File f = new File(tempFile, fileConfig.getMetadataFileName());
+		FileOutputStream out = new FileOutputStream(f);
+		props.store(out, "Document meta data");
 	}
+
 
 }
