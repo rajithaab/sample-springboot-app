@@ -20,12 +20,7 @@ import com.sample.rest.data.model.Document;
 public class FileSystemDocumentDao{
 	
 	private static final Logger LOG = Logger.getLogger(FileSystemDocumentDao.class);
-	public static final String PATH = "E://sample";
-	public static final String META_DATA_FILE_NAME = "metadata.properties";
 	
-	@Autowired
-	private MetaDataDBDao metadataDao;
-
 	@Autowired
 	private FileConfig fileConfig;
 	
@@ -44,20 +39,11 @@ public class FileSystemDocumentDao{
 			createDocumentDirectory(document);
 			saveFile(document);
 			saveMetaDatainFileSystem(document);
-			saveMetaDatainDB(document);
 		} catch (IOException e) {
 			String message = "Error while inserting document";
             LOG.error(message, e);
             throw new RuntimeException(message, e);
 		}
-	}
-	
-	private void saveMetaDatainDB(Document document) {
-		metadataDao.create(document.getMetadata());
-	}
-	
-	private String getDocumentGeneratedId(Document document) {
-		return metadataDao.getDocumentId(document.getMetadata().getUuid());
 	}
 	
 	private String createDocumentDirectory(Document document) {
@@ -72,12 +58,11 @@ public class FileSystemDocumentDao{
     
     private String getDirectoryPath(String uuid) {
         StringBuilder sb = new StringBuilder();
-        sb.append(PATH).append(File.separator).append(uuid);
+        sb.append(fileConfig.getUploadPath()).append(File.separator).append(uuid);
         String path = sb.toString();
         return path;
     }
 	
-
 	private void saveMetaDatainFileSystem(Document document) throws IOException {
 		String path = getDirectoryPath(document);
         Properties props = document.createProperties();
