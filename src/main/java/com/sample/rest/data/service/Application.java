@@ -2,6 +2,7 @@ package com.sample.rest.data.service;
 
 import javax.servlet.MultipartConfigElement;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.autoconfigure.domain.EntityScan;
@@ -15,12 +16,15 @@ import org.springframework.context.annotation.ComponentScan;
 @ComponentScan("com.sample.rest")
 @EntityScan( basePackages = {"com.sample.rest.data.dao"} )
 public class Application extends SpringBootServletInitializer {
-
-    @Bean
+	
+	@Autowired
+	private FileConfig fileConfig;
+	
+	@Bean
     public MultipartConfigElement multipartConfigElement() {
 		MultipartConfigFactory factory = new MultipartConfigFactory();
-        factory.setMaxFileSize("5120KB");
-        factory.setMaxRequestSize("5120KB");
+        factory.setMaxFileSize(fileConfig.getMaxSize());
+        factory.setMaxRequestSize(fileConfig.getMaxRequesSize());
         return factory.createMultipartConfig();
     }
 

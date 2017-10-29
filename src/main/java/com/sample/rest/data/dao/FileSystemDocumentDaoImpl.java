@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.sample.rest.data.model.Document;
+import com.sample.rest.data.service.FileConfig;
 
 @Service("documentDao")
 public class FileSystemDocumentDaoImpl implements IDocumentFileSystemDao{
@@ -25,10 +26,12 @@ public class FileSystemDocumentDaoImpl implements IDocumentFileSystemDao{
 	@Autowired
 	private MetaDataDBDao metadataDao;
 
+	@Autowired
+	private FileConfig fileConfig;
 	
 	@PostConstruct
     public void init() {
-        createDirectory(PATH);
+        createDirectory(fileConfig.getUploadPath());
     }
 	
 	private void createDirectory(String path) {
@@ -69,7 +72,7 @@ public class FileSystemDocumentDaoImpl implements IDocumentFileSystemDao{
 	private void saveMetaData(Document document) throws IOException {
 		String path = getDirectoryPath(document);
         Properties props = document.createProperties();
-        File f = new File(new File(path), META_DATA_FILE_NAME);
+        File f = new File(new File(path), fileConfig.getMetadataFileName());
         OutputStream out = new FileOutputStream( f );
         props.store(out, "Document meta data");
         
