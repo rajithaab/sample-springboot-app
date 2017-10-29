@@ -1,4 +1,4 @@
-package com.sample.rest.data.service;
+package com.sample.rest.data;
 
 import javax.servlet.MultipartConfigElement;
 

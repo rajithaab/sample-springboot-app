@@ -13,13 +13,13 @@ import org.apache.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.sample.rest.data.FileConfig;
 import com.sample.rest.data.model.Document;
-import com.sample.rest.data.service.FileConfig;
 
 @Service("documentDao")
-public class FileSystemDocumentDaoImpl implements IDocumentFileSystemDao{
+public class FileSystemDocumentDao{
 	
-	private static final Logger LOG = Logger.getLogger(FileSystemDocumentDaoImpl.class);
+	private static final Logger LOG = Logger.getLogger(FileSystemDocumentDao.class);
 	public static final String PATH = "E://sample";
 	public static final String META_DATA_FILE_NAME = "metadata.properties";
 	
@@ -42,13 +42,22 @@ public class FileSystemDocumentDaoImpl implements IDocumentFileSystemDao{
 	public void insert(Document document) {
 		try {
 			createDocumentDirectory(document);
-			saveFileData(document);
-			saveMetaData(document);
+			saveFile(document);
+			saveMetaDatainFileSystem(document);
+			saveMetaDatainDB(document);
 		} catch (IOException e) {
 			String message = "Error while inserting document";
             LOG.error(message, e);
             throw new RuntimeException(message, e);
 		}
+	}
+	
+	private void saveMetaDatainDB(Document document) {
+		metadataDao.create(document.getMetadata());
+	}
+	
+	private String getDocumentGeneratedId(Document document) {
+		return metadataDao.getDocumentId(document.getMetadata().getUuid());
 	}
 	
 	private String createDocumentDirectory(Document document) {
@@ -69,17 +78,15 @@ public class FileSystemDocumentDaoImpl implements IDocumentFileSystemDao{
     }
 	
 
-	private void saveMetaData(Document document) throws IOException {
+	private void saveMetaDatainFileSystem(Document document) throws IOException {
 		String path = getDirectoryPath(document);
         Properties props = document.createProperties();
         File f = new File(new File(path), fileConfig.getMetadataFileName());
         OutputStream out = new FileOutputStream( f );
         props.store(out, "Document meta data");
-        
-        metadataDao.create(document.getMetadata());
-	}
+    }
 
-	private void saveFileData(Document document) throws IOException {
+	private void saveFile(Document document) throws IOException {
 		String path = getDirectoryPath(document);
         BufferedOutputStream stream = new BufferedOutputStream(new FileOutputStream(new File(new File(path), document.getFileName())));
         stream.write(document.getFileData());

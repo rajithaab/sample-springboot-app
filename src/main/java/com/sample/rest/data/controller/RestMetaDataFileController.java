@@ -1,11 +1,10 @@
-package com.sample.rest.data.service;
+package com.sample.rest.data.controller;
 
 import java.util.Date;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -16,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.sample.rest.data.model.Document;
 import com.sample.rest.data.model.DocumentMetaData;
+import com.sample.rest.data.service.IDocumentPersistService;
 
 @RestController
 public class RestMetaDataFileController {
@@ -34,9 +34,6 @@ public class RestMetaDataFileController {
             Document document = new Document(file.getBytes(), file.getOriginalFilename(), date, person );
             filePersistService.save(document);
             return document.getMetadata();
-        } catch (RuntimeException e) {
-        	logger.error("Error while uploading.", e);
-            throw e;
         } catch (Exception e) {
         	logger.error("Error while uploading.", e);
             throw new RuntimeException(e);

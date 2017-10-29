@@ -19,5 +19,9 @@ public class MetaDataDBDao {
 		MetaData metadata = new MetaData(docMetadata.getUuid(), docMetadata.getFileName(), docMetadata.getDocumentDate(), docMetadata.getPersonName());
 		entityManager.persist(metadata);
 	}
+	
+	public String getDocumentId(String uuid) {
+		return entityManager.find(String.class, uuid);
+	}
 
 }
